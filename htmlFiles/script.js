@@ -45,3 +45,10 @@ function speichereProfil() {
         "Schnelligkeit: " + benutzerProfil.schnelligkeit + "<br>" +
         "Koordination: " + benutzerProfil.koordination;
 }
+
+// Button reagiert auf Klick
+let speichernButton = document.getElementById("saveProfileBtn");
+
+speichernButton.addEventListener("click", function() {
+    speichereProfil();
+});
