@@ -38,10 +38,7 @@ function speichereProfil() {
 }
 
 // Button reagiert auf Klick
-let speichernButton = document.getElementById("saveProfileBtn");
-
-speichernButton.addEventListener("click", function() {
-    speichereProfil();
-    
-    console.log("Aktuelles Profil:", profileData);
+saveProfileBtn.addEventListener("click", function () {
+  speichereProfil();
+  console.log("Aktuelles Profil:", profileData);
 });
