@@ -39,6 +39,17 @@ function speichereProfil() {
 
 // Berechnungslogik: (ausdauer + kraft + schnelligkeit + koordination) / 4 (refs #2)
 
+function berechneGesamtwert() {
+  let summe =
+    profileData.stats.ausdauer +
+    profileData.stats.kraft +
+    profileData.stats.schnelligkeit +
+    profileData.stats.koordination;
+
+  let durchschnitt = summe / 4;
+  return durchschnitt;
+}
+
 // Event Listener
 
 // Button reagiert auf Klick
