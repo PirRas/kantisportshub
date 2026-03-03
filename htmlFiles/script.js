@@ -2,10 +2,10 @@
 const profileData = {
   name: "",
   stats: {
-    endurance: null,
-    strength: null,
-    speed: null,
-    coordination: null
+    ausdauer: null,
+    kraft: null,
+    schnelligkeit: null,
+    koordination: null
   }
 };
 
@@ -22,28 +22,19 @@ const outputText = document.getElementById("outputText");
 
 //Funktionen
 function speichereProfil() {
+  profileData.name = studentNameInput.value;
 
-    // Werte aus den Input-Feldern holen
-    let nameWert = document.getElementById("nameInput").value;
-    let ausdauerWert = document.getElementById("ausdauerInput").value;
-    let kraftWert = document.getElementById("kraftInput").value;
-    let schnelligkeitWert = document.getElementById("schnelligkeitInput").value;
-    let koordinationWert = document.getElementById("koordinationInput").value;
+  profileData.stats.ausdauer = Number(enduranceInput.value);
+  profileData.stats.kraft = Number(strengthInput.value);
+  profileData.stats.schnelligkeit = Number(speedInput.value);
+  profileData.stats.koordination = Number(coordinationInput.value);
 
-    // Werte im Benutzerprofil speichern
-    benutzerProfil.name = nameWert;
-    benutzerProfil.ausdauer = Number(ausdauerWert);
-    benutzerProfil.kraft = Number(kraftWert);
-    benutzerProfil.schnelligkeit = Number(schnelligkeitWert);
-    benutzerProfil.koordination = Number(koordinationWert);
-
-    // Ausgabe auf der Webseite anzeigen
-    document.getElementById("profilAusgabe").innerHTML =
-        "Name: " + benutzerProfil.name + "<br>" +
-        "Ausdauer: " + benutzerProfil.ausdauer + "<br>" +
-        "Kraft: " + benutzerProfil.kraft + "<br>" +
-        "Schnelligkeit: " + benutzerProfil.schnelligkeit + "<br>" +
-        "Koordination: " + benutzerProfil.koordination;
+  outputText.innerHTML =
+    "Name: " + profileData.name + "<br>" +
+    "Ausdauer: " + profileData.stats.ausdauer + "<br>" +
+    "Kraft: " + profileData.stats.kraft + "<br>" +
+    "Schnelligkeit: " + profileData.stats.schnelligkeit + "<br>" +
+    "Koordination: " + profileData.stats.koordination;
 }
 
 // Button reagiert auf Klick
@@ -51,4 +42,6 @@ let speichernButton = document.getElementById("saveProfileBtn");
 
 speichernButton.addEventListener("click", function() {
     speichereProfil();
+    
+    console.log("Aktuelles Profil:", profileData);
 });
