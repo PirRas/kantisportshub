@@ -37,6 +37,10 @@ function speichereProfil() {
     "Koordination: " + profileData.stats.koordination;
 }
 
+// Berechnungslogik: (ausdauer + kraft + schnelligkeit + koordination) / 4 (refs #2)
+
+// Event Listener
+
 // Button reagiert auf Klick
 saveProfileBtn.addEventListener("click", function () {
   speichereProfil();
