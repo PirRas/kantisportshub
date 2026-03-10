@@ -21,15 +21,18 @@ const saveProfileBtn = document.getElementById("saveProfileBtn");
 const outputText = document.getElementById("outputText");
 const overallText = document.getElementById("overallText");
 
+const profileImageInput = document.getElementById("profileImageInput");
+const profileImagePreview = document.getElementById("profileImagePreview");
+
 //Funktionen
 function speichereProfil() {
   if (
-    enduranceInput.value === "" ||
-    strengthInput.value === "" ||
-    speedInput.value === "" ||
-    coordinationInput.value === ""
-   ) {
-    overallText.innerHTML = "Gesamtwert: Bitte alle vier Werte eingeben.";
+    enduranceInput.value < 0 || enduranceInput.value > 100 ||
+    strengthInput.value < 0 || strengthInput.value > 100 ||
+    speedInput.value < 0 || speedInput.value > 100 ||
+    coordinationInput.value < 0 || coordinationInput.value > 100
+  ) {
+    outputText.innerHTML = "Fehler: Alle Werte müssen zwischen 0 und 100 liegen.";
     return;
   }
   profileData.name = studentNameInput.value;
@@ -48,6 +51,11 @@ function speichereProfil() {
 
   let gesamtwert = berechneGesamtwert(); 
   overallText.innerHTML = "Gesamtwert: " + gesamtwert.toFixed(1);
+
+  if (profileImageInput.files.length > 0) {
+    let imageURL = URL.createObjectURL(profileImageInput.files[0]);
+    profileImagePreview.src = imageURL;
+  }
 } 
 
 // Berechnungslogik: (ausdauer + kraft + schnelligkeit + koordination) / 4 (refs #2)
