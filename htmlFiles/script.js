@@ -22,6 +22,15 @@ const outputText = document.getElementById("outputText");
 
 //Funktionen
 function speichereProfil() {
+  if (
+    enduranceInput.value === "" ||
+    strengthInput.value === "" ||
+    speedInput.value === "" ||
+    coordinationInput.value === ""
+   ) {
+    overallText.innerHTML = "Gesamtwert: Bitte alle vier Werte eingeben.";
+    return;
+  }
   profileData.name = studentNameInput.value;
 
   profileData.stats.ausdauer = Number(enduranceInput.value);
