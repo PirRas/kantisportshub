@@ -70,3 +70,6 @@ saveProfileBtn.addEventListener("click", function () {
   speichereProfil();
   console.log("Aktuelles Profil:", profileData);
 });
+
+// Testaufruf der Berechnungsfunktion (refs #11)
+console.log("Gesamtwert:", berechneGesamtwert());
