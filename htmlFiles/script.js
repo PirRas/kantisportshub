@@ -35,7 +35,11 @@ function speichereProfil() {
     "Kraft: " + profileData.stats.kraft + "<br>" +
     "Schnelligkeit: " + profileData.stats.schnelligkeit + "<br>" +
     "Koordination: " + profileData.stats.koordination;
-}
+  const overallText = document.getElementById("overallText");
+
+  let gesamtwert = berechneGesamtwert(); 
+  overallText.innerHTML = "Gesamtwert: " + gesamtwert.toFixed(1);
+} 
 
 // Berechnungslogik: (ausdauer + kraft + schnelligkeit + koordination) / 4 (refs #2)
 
