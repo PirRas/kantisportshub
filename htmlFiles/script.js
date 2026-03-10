@@ -19,6 +19,7 @@ const coordinationInput = document.getElementById("coordination");
 
 const saveProfileBtn = document.getElementById("saveProfileBtn");
 const outputText = document.getElementById("outputText");
+const overallText = document.getElementById("overallText");
 
 //Funktionen
 function speichereProfil() {
@@ -32,7 +33,6 @@ function speichereProfil() {
     return;
   }
   profileData.name = studentNameInput.value;
-
   profileData.stats.ausdauer = Number(enduranceInput.value);
   profileData.stats.kraft = Number(strengthInput.value);
   profileData.stats.schnelligkeit = Number(speedInput.value);
@@ -44,7 +44,7 @@ function speichereProfil() {
     "Kraft: " + profileData.stats.kraft + "<br>" +
     "Schnelligkeit: " + profileData.stats.schnelligkeit + "<br>" +
     "Koordination: " + profileData.stats.koordination;
-  const overallText = document.getElementById("overallText");
+  
 
   let gesamtwert = berechneGesamtwert(); 
   overallText.innerHTML = "Gesamtwert: " + gesamtwert.toFixed(1);
