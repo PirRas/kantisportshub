@@ -11,7 +11,6 @@ const profileData = {
 
 // HTML-Elemente
 const studentNameInput = document.getElementById("studentName");
-
 const enduranceInput = document.getElementById("endurance");
 const strengthInput = document.getElementById("strength");
 const speedInput = document.getElementById("speed");
@@ -77,6 +76,26 @@ function berechneGesamtwert() {
 saveProfileBtn.addEventListener("click", function () {
   speichereProfil();
   console.log("Aktuelles Profil:", profileData);
+  const name = studentNameInput.value;
+  const ausdauer = enduranceInput.value; 
+  const kraft = strengthInput.value;
+  const schnelligkeit = speedInput.value;
+  const koordination = coordinationInput.value;
+
+  fetch('http://localhost:3000/api/sports', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ name, ausdauer, kraft, schnelligkeit, koordination })
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Erfolg:', data);
+    })
+    .catch((error) => {
+      console.error('Fehler:', error);
+    });
 });
 
 // Testaufruf der Berechnungsfunktion (refs #11)
