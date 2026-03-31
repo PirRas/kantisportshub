@@ -1,6 +1,7 @@
 const express = require('express');
 const Database = require('better-sqlite3');
 const cors = require('cors');
+const crypto = require('crypto');
 
 const app = express();
 const port = 3000;
@@ -58,6 +59,31 @@ app.post('/api/register', (req, res) => {
     } catch (error) {
         res.status(400).json({ message: 'Benutzer existiert bereits' });
     }
+});
+
+app.post('/api/login', (req, res) => {
+    const { username, password } = req.body;
+
+    const user = database
+        .prepare('SELECT * FROM users WHERE username = ? AND password = ?')
+        .get(username, password);
+
+    if (!user) {
+        return res.status(401).json({ message: 'Falsche Login Daten' });
+    }
+
+    const token = crypto.randomUUID();
+
+    database
+        .prepare('UPDATE users SET token = ? WHERE id = ?')
+        .run(token, user.id);
+
+    res.json({
+        message: 'Login erfolgreich',
+        token: token,
+        username: user.username,
+        role: user.role
+    });
 });
 
 app.post('/api/sports', (req, res) => {
