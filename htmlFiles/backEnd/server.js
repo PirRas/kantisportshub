@@ -34,6 +34,32 @@ database.prepare(`
     )
 `).run();
 
+app.post('/api/register', (req, res) => {
+    const { username, password, role } = req.body;
+
+    if (!username || !password || !role) {
+        return res.status(400).json({ message: 'Alle Felder sind erforderlich' });
+    }
+
+    if (role !== 'Schüler' && role !== 'Lehrperson') {
+        return res.status(400).json({ message: 'Ungültige Rolle' });
+    }
+
+    try {
+        const info = database
+            .prepare('INSERT INTO users (username, password, role) VALUES (?, ?, ?)')
+            .run(username, password, role);
+
+        database
+            .prepare('INSERT INTO profiles (user_id) VALUES (?)')
+            .run(info.lastInsertRowid);
+
+        res.json({ message: 'Registrierung erfolgreich' });
+    } catch (error) {
+        res.status(400).json({ message: 'Benutzer existiert bereits' });
+    }
+});
+
 app.post('/api/sports', (req, res) => {
     const { name, ausdauer, kraft, schnelligkeit, koordination } = req.body;
 
