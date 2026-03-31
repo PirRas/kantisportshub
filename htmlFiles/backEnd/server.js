@@ -66,6 +66,18 @@ app.post('/api/sports', (req, res) => {
     });
 });
 
+app.get('/api/sports', (req, res) => {
+    
+    console.log('GET /api/sports aufgerufen');
+    const sportsData = database.prepare("SELECT * FROM sportsdata").all();
+    console.log('Daten aus der Datenbank:', sportsData);
+    
+    res.json({
+        message: 'Hallo Kai',
+        data: sportsData
+    });
+});
+
 
 app.listen(port, () => {
     console.log(`Server läuft auf http://localhost:${port}`);

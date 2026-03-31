@@ -71,6 +71,21 @@ function berechneGesamtwert() {
 }
 
 // Event Listener
+const loadsportsdatabutton = document.getElementById("GETSportsData");
+loadsportsdatabutton.addEventListener("click", function() {
+  fetch('http://localhost:3000/api/sports', {
+    method: 'GET'
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log('Erfolg:', data); 
+    alert(data)
+  })
+  .catch((error) => {
+    console.error('Fehler:', error);
+  });
+});
+
 
 // Button reagiert auf Klick
 saveProfileBtn.addEventListener("click", function () {
@@ -97,6 +112,8 @@ saveProfileBtn.addEventListener("click", function () {
       console.error('Fehler:', error);
     });
 });
+
+
 
 // Testaufruf der Berechnungsfunktion (refs #11)
 console.log("Gesamtwert:", berechneGesamtwert());
