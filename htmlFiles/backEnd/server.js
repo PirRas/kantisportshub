@@ -11,14 +11,26 @@ app.use(express.json());
 const database = new Database('database.db', { timeout: 5000 });
 
 database.prepare(`
-    CREATE TABLE IF NOT EXISTS sportsdata (
+    CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        ausdauer INTEGER NOT NULL,
-        kraft INTEGER NOT NULL,
-        schnelligkeit INTEGER NOT NULL,
-        koordination INTEGER NOT NULL,
-        gesamtwert REAL NOT NULL
+        username TEXT NOT NULL UNIQUE,
+        password TEXT NOT NULL,
+        role TEXT NOT NULL,
+        token TEXT
+    )
+`).run();
+
+database.prepare(`
+    CREATE TABLE IF NOT EXISTS profiles (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL UNIQUE,
+        image TEXT DEFAULT '',
+        ausdauer INTEGER DEFAULT 0,
+        kraft INTEGER DEFAULT 0,
+        schnelligkeit INTEGER DEFAULT 0,
+        koordination INTEGER DEFAULT 0,
+        gesamtwert REAL DEFAULT 0,
+        FOREIGN KEY (user_id) REFERENCES users(id)
     )
 `).run();
 
