@@ -2,6 +2,7 @@ const express = require('express');
 const Database = require('better-sqlite3');
 const cors = require('cors');
 const crypto = require('crypto');
+const bcrypt = require('bcrypt');
 
 const app = express();
 const port = 3000;
@@ -35,7 +36,7 @@ database.prepare(`
     )
 `).run();
 
-app.post('/api/register', (req, res) => {
+app.post('/api/register', async (req, res) => {
     const { username, password, role } = req.body;
 
     if (!username || !password || !role) {
@@ -46,10 +47,16 @@ app.post('/api/register', (req, res) => {
         return res.status(400).json({ message: 'Ungültige Rolle' });
     }
 
+    if (password.length < 6) {
+        return res.status(400).json({ message: 'Das Passwort muss mindestens 6 Zeichen lang sein' });
+    }
+
     try {
+        const hashedPassword = await bcrypt.hash(password, 10);
+
         const info = database
             .prepare('INSERT INTO users (username, password, role) VALUES (?, ?, ?)')
-            .run(username, password, role);
+            .run(username, hashedPassword, role);
 
         database
             .prepare('INSERT INTO profiles (user_id) VALUES (?)')
@@ -61,14 +68,20 @@ app.post('/api/register', (req, res) => {
     }
 });
 
-app.post('/api/login', (req, res) => {
+app.post('/api/login', async (req, res) => {
     const { username, password } = req.body;
 
-    const user = database
-        .prepare('SELECT * FROM users WHERE username = ? AND password = ?')
-        .get(username, password);
+    const user = database //Verify password (refs #19)
+        .prepare('SELECT * FROM users WHERE username = ?')
+        .get(username);
 
     if (!user) {
+        return res.status(401).json({ message: 'Falsche Login Daten' });
+    }
+
+    const passwordIstRichtig = await bcrypt.compare(password, user.password);
+
+    if (!passwordIstRichtig) {
         return res.status(401).json({ message: 'Falsche Login Daten' });
     }
 
