@@ -9,6 +9,12 @@ const profileData = {
   }
 };
 
+const token = localStorage.getItem("token");
+
+if (!token) {
+  window.location.href = "login.html";
+}
+
 // HTML-Elemente
 const studentNameInput = document.getElementById("studentName");
 const enduranceInput = document.getElementById("endurance");

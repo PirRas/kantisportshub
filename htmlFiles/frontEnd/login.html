@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>KANTISPORTS HUB Login</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+
+  <body>
+    <main>
+      <div id="login-container">
+        <h1>Login / Registrierung</h1>
+
+        <input id="loginUsername" type="text" placeholder="Benutzername" />
+        <input id="loginPassword" type="password" placeholder="Passwort" />
+
+        <select id="registerRole">
+          <option value="Schüler">Schüler</option>
+          <option value="Lehrperson">Lehrperson</option>
+        </select>
+
+        <button id="loginBtn" type="button">Login</button>
+        <button id="registerBtn" type="button">Registrieren</button>
+
+        <p id="authMessage"></p>
+      </div>
+      <script src="login.js"></script>
+    </main>
+  </body>
+</html>

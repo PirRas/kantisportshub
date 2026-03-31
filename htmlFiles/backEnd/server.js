@@ -36,6 +36,25 @@ database.prepare(`
     )
 `).run();
 
+function authMiddleware(req, res, next) {
+    const token = req.headers.authorization;
+
+    if (!token) {
+        return res.status(401).json({ message: 'Nicht eingeloggt' });
+    }
+
+    const user = database
+        .prepare('SELECT * FROM users WHERE token = ?')
+        .get(token);
+
+    if (!user) {
+        return res.status(401).json({ message: 'Ungültiger Token' });
+    }
+
+    req.user = user;
+    next();
+}
+
 app.post('/api/register', async (req, res) => {
     const { username, password, role } = req.body;
 
