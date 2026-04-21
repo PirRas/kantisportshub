@@ -123,6 +123,52 @@ app.post('/api/login', async (req, res) => {
     });
 });
 
+// Profil laden (NUR EIGENES)
+app.get('/api/profile', authMiddleware, (req, res) => {
+    const profile = database
+        .prepare('SELECT * FROM profiles WHERE user_id = ?')
+        .get(req.user.id);
+
+    res.json(profile);
+});
+
+// Profil speichern / Updaten
+app.put('/api/profile', authMiddleware, (req, res) => {
+    const { name, ausdauer, kraft, schnelligkeit, koordination, image } = req.body;
+
+    const zahlen = [ausdauer, kraft, schnelligkeit, koordination].map(Number);
+
+    if (zahlen.some(v => isNaN(v) || v < 0 || v > 100)) {
+        return res.status(400).json({ message: 'Werte müssen 0–100 sein' });
+    }
+
+    const gesamtwert = zahlen.reduce((a, b) => a + b, 0) / 4;
+
+    const existing = database
+        .prepare('SELECT * FROM profiles WHERE user_id = ?')
+        .get(req.user.id);
+
+    // Nur ein Name
+    const finalName = existing.name ? existing.name : name;
+
+    database.prepare(`
+        UPDATE profiles
+        SET name=?, image=?, ausdauer=?, kraft=?, schnelligkeit=?, koordination=?, gesamtwert=?
+        WHERE user_id=?
+    `).run(
+        finalName,
+        image || '',
+        zahlen[0],
+        zahlen[1],
+        zahlen[2],
+        zahlen[3],
+        gesamtwert,
+        req.user.id
+    );
+
+    res.json({ message: 'Profil gespeichert' });
+});
+
 // Route gibt alle Benutzer mit ihren Werten zurück
 // Wird gebraucht, damit man später Benutzer vergleichen kann
 app.get('/api/users', authMiddleware, (req, res) => {

@@ -43,6 +43,37 @@ const rankingOutput = document.getElementById("rankingOutput");
 // Hier werden alle Benutzer gespeichert nachdem sie geladen wurden
 let allUsers = [];
 
+// Bild speichern
+imageInput.addEventListener("change", () => {
+    const file = imageInput.files[0];
+    const reader = new FileReader();
+    reader.onload = () => imageData = reader.result;
+    reader.readAsDataURL(file);
+});
+
+// Profil laden
+async function loadProfile() {
+    const res = await fetch("http://localhost:3000/api/profile", {
+        headers: { Authorization: token }
+    });
+
+    const data = await res.json();
+
+    if (data.name) {
+        nameInput.value = data.name;
+        nameInput.disabled = true; 
+    }
+
+    endurance.value = data.ausdauer;
+    strength.value = data.kraft;
+    speed.value = data.schnelligkeit;
+    coordination.value = data.koordination;
+
+    if (data.image) {
+        document.getElementById("profileImagePreview").src = data.image;
+    }
+}
+
 
 // Funktion lädt alle Benutzer vom Server
 async function ladeAlleBenutzer() {
@@ -170,23 +201,6 @@ async function ladeRangliste() {
   });
 }
 
-// Event Listener
-const loadsportsdatabutton = document.getElementById("GETSportsData");
-loadsportsdatabutton.addEventListener("click", function() {
-  fetch('http://localhost:3000/api/sports', {
-    method: 'GET'
-  })
-  .then(response => response.json())
-  .then(data => {
-    console.log('Erfolg:', data); 
-    alert(data)
-  })
-  .catch((error) => {
-    console.error('Fehler:', error);
-  });
-});
-
-
 // Button reagiert auf Klick
 saveProfileBtn.addEventListener("click", function () {
   speichereProfil();
@@ -254,3 +268,6 @@ loadRankingBtn.addEventListener("click", function () {
 
 // Testaufruf der Berechnungsfunktion (refs #11)
 console.log("Gesamtwert:", berechneGesamtwert());
+
+console.log(ladeAlleBenutzer());
+console.log(ladeRangliste());
