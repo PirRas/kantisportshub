@@ -11,18 +11,19 @@
     <main>
       <div id="login-container">
         <h1>Login / Registrierung</h1>
-
+        <!-- Eingabe für Benutzername -->
         <input id="loginUsername" type="text" placeholder="Benutzername" />
+        <!-- Passwort wird versteckt eingegeben -->
         <input id="loginPassword" type="password" placeholder="Passwort" />
-
+        <!-- Auswahl der Rolle bei Registrierung -->
         <select id="registerRole">
           <option value="Schüler">Schüler</option>
           <option value="Lehrperson">Lehrperson</option>
         </select>
-
+        <!-- Buttons für Login und Registrierung -->
         <button id="loginBtn" type="button">Login</button>
         <button id="registerBtn" type="button">Registrieren</button>
-
+        <!-- Fehlermeldungen werden hier angezeigt -->
         <p id="authMessage"></p>
       </div>
       <script src="login.js"></script>

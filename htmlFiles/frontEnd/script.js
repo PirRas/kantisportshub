@@ -8,9 +8,9 @@ const profileData = {
     koordination: null
   }
 };
-
+// Token aus localStorage holen
 const token = localStorage.getItem("token");
-
+// Wenn kein Token vorhanden ist, zur Login-Seite weiterleiten
 if (!token) {
   window.location.href = "login.html";
 }

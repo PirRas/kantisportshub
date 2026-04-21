@@ -11,7 +11,7 @@ app.use(cors());
 app.use(express.json());
 
 const database = new Database('database.db', { timeout: 5000 });
-
+// Tabelle für Benutzer (Login Daten)
 database.prepare(`
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -21,7 +21,7 @@ database.prepare(`
         token TEXT
     )
 `).run();
-
+// Tabelle für Profil (Werte des Benutzers); getrennt von users, damit Login und Daten sauber organisiert sind
 database.prepare(`
     CREATE TABLE IF NOT EXISTS profiles (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -35,33 +35,33 @@ database.prepare(`
         FOREIGN KEY (user_id) REFERENCES users(id)
     )
 `).run();
-
+//Ist Benutzer eingeloggt?
 function authMiddleware(req, res, next) {
     const token = req.headers.authorization;
-
+    // Überprüfen, ob ein Token vorhanden ist
     if (!token) {
         return res.status(401).json({ message: 'Nicht eingeloggt' });
     }
-
+    // Benutzer wird anhand des Tokens gesucht, um die Authentifizierung zu überprüfen
     const user = database
         .prepare('SELECT * FROM users WHERE token = ?')
         .get(token);
-
+    //Ungültiger Token
     if (!user) {
         return res.status(401).json({ message: 'Ungültiger Token' });
     }
-
+    // Benutzer wird in der Anfrage gespeichert, damit man später darauf zugreifen kann
     req.user = user;
     next();
 }
-
+// Benutzer kann sich registrieren
 app.post('/api/register', async (req, res) => {
     const { username, password, role } = req.body;
-
+    // Überprüfung, ob alle Felder ausgefüllt sind
     if (!username || !password || !role) {
         return res.status(400).json({ message: 'Alle Felder sind erforderlich' });
     }
-
+    // Rolle muss gültig sein
     if (role !== 'Schüler' && role !== 'Lehrperson') {
         return res.status(400).json({ message: 'Ungültige Rolle' });
     }
@@ -71,45 +71,50 @@ app.post('/api/register', async (req, res) => {
     }
 
     try {
+        // Passwort wird gehasht, damit es nicht im Klartext gespeichert wird
         const hashedPassword = await bcrypt.hash(password, 10);
 
+        // Benutzer speichern
         const info = database
             .prepare('INSERT INTO users (username, password, role) VALUES (?, ?, ?)')
             .run(username, hashedPassword, role);
-
+        // Leeres Profil wird direkt erstellt, damit jeder genau ein Profil hat
         database
             .prepare('INSERT INTO profiles (user_id) VALUES (?)')
             .run(info.lastInsertRowid);
 
         res.json({ message: 'Registrierung erfolgreich' });
     } catch (error) {
+        // Fehler abfangen, z.B. wenn der Benutzername bereits existiert
         res.status(400).json({ message: 'Benutzer existiert bereits' });
     }
 });
-
+// Benutzer kann sich einloggen
 app.post('/api/login', async (req, res) => {
     const { username, password } = req.body;
 
+    //Benutzer wird anhand des Benutzernamens gesucht, um das Passwort zu überprüfen
     const user = database //Verify password (refs #19)
         .prepare('SELECT * FROM users WHERE username = ?')
         .get(username);
-
+    // Wenn kein Benutzer gefunden wird, wird eine Fehlermeldung zurückgegeben
     if (!user) {
         return res.status(401).json({ message: 'Falsche Login Daten' });
     }
-
+    // Überprüfung des Passworts mit bcrypt, da es gehasht in der Datenbank gespeichert ist
     const passwordIstRichtig = await bcrypt.compare(password, user.password);
 
     if (!passwordIstRichtig) {
         return res.status(401).json({ message: 'Falsche Login Daten' });
     }
-
+    //Token wird generiert, damit der Benutzer bei zukünftigen Anfragen authentifiziert werden kann
     const token = crypto.randomUUID();
-
+    // Token wird in der Datenbank gespeichert
     database
         .prepare('UPDATE users SET token = ? WHERE id = ?')
         .run(token, user.id);
 
+    //Daten an Frontend zurückgeben
     res.json({
         message: 'Login erfolgreich',
         token: token,
