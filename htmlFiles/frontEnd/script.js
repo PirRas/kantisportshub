@@ -35,6 +35,11 @@ const compareUser2 = document.getElementById("compareUser2");
 const compareBtn = document.getElementById("compareBtn");
 const compareOutput = document.getElementById("compareOutput");
 
+// HTML Elemente für Rangliste
+const roleFilter = document.getElementById("roleFilter");
+const loadRankingBtn = document.getElementById("loadRankingBtn");
+const rankingOutput = document.getElementById("rankingOutput");
+
 // Hier werden alle Benutzer gespeichert nachdem sie geladen wurden
 let allUsers = [];
 
@@ -127,6 +132,44 @@ function berechneGesamtwert() {
   return durchschnitt;
 }
 
+// Funktion lädt Rangliste vom Backend
+async function ladeRangliste() {
+
+  const response = await fetch(
+    "http://localhost:3000/api/ranking?role=" + encodeURIComponent(roleFilter.value),
+    {
+      headers: {
+        Authorization: token
+      }
+    }
+  );
+
+  const data = await response.json();
+
+  // Fehler anzeigen
+  if (!response.ok) {
+    rankingOutput.innerHTML = "Fehler beim Laden der Rangliste.";
+    return;
+  }
+
+  // Alte Anzeige löschen
+  rankingOutput.innerHTML = "";
+
+  // Jeder Benutzer bekommt eine Platzierung (Index +1)
+  data.forEach((user, index) => {
+
+    rankingOutput.innerHTML +=
+      "<p>" +
+      (index + 1) + ". " +
+      user.username +
+      " | " +
+      user.role +
+      " | Gesamtwert: " +
+      Number(user.gesamtwert).toFixed(1) +
+      "</p>";
+  });
+}
+
 // Event Listener
 const loadsportsdatabutton = document.getElementById("GETSportsData");
 loadsportsdatabutton.addEventListener("click", function() {
@@ -204,7 +247,10 @@ compareBtn.addEventListener("click", function () {
     "</p>";
 });
 
-
+// Button verbindet Funktion mit Klick
+loadRankingBtn.addEventListener("click", function () {
+  ladeRangliste();
+});
 
 // Testaufruf der Berechnungsfunktion (refs #11)
 console.log("Gesamtwert:", berechneGesamtwert());
