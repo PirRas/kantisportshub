@@ -170,6 +170,40 @@ saveProfileBtn.addEventListener("click", function () {
     });
 });
 
+// Wird ausgeführt wenn der Button geklickt wird
+compareBtn.addEventListener("click", function () {
+
+  // Gewählte Benutzer werden im Array gesucht
+  const user1 = allUsers.find(user => user.id == compareUser1.value);
+  const user2 = allUsers.find(user => user.id == compareUser2.value);
+
+  // Falls nichts ausgewählt wurde, wird eine Meldung angezeigt
+  if (!user1 || !user2) {
+    compareOutput.innerHTML = "Bitte zwei Benutzer auswählen.";
+    return;
+  }
+
+  // Werte werden einfach als Text ausgegeben, damit man sie direkt vergleichen kann
+  compareOutput.innerHTML =
+    "<h3>" + user1.username + " vs " + user2.username + "</h3>" +
+
+    "<p>" + user1.username +
+    ": Ausdauer " + user1.ausdauer +
+    ", Kraft " + user1.kraft +
+    ", Schnelligkeit " + user1.schnelligkeit +
+    ", Koordination " + user1.koordination +
+    ", Gesamtwert " + Number(user1.gesamtwert).toFixed(1) +
+    "</p>" +
+
+    "<p>" + user2.username +
+    ": Ausdauer " + user2.ausdauer +
+    ", Kraft " + user2.kraft +
+    ", Schnelligkeit " + user2.schnelligkeit +
+    ", Koordination " + user2.koordination +
+    ", Gesamtwert " + Number(user2.gesamtwert).toFixed(1) +
+    "</p>";
+});
+
 
 
 // Testaufruf der Berechnungsfunktion (refs #11)
