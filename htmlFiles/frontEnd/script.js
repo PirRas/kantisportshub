@@ -29,6 +29,57 @@ const overallText = document.getElementById("overallText");
 const profileImageInput = document.getElementById("profileImageInput");
 const profileImagePreview = document.getElementById("profileImagePreview");
 
+// HTML Elemente für Vergleich 
+const compareUser1 = document.getElementById("compareUser1");
+const compareUser2 = document.getElementById("compareUser2");
+const compareBtn = document.getElementById("compareBtn");
+const compareOutput = document.getElementById("compareOutput");
+
+// Hier werden alle Benutzer gespeichert nachdem sie geladen wurden
+let allUsers = [];
+
+
+// Funktion lädt alle Benutzer vom Server
+async function ladeAlleBenutzer() {
+
+  // Anfrage an Backend, Token nötig wegen Login System
+  const response = await fetch("http://localhost:3000/api/users", {
+    headers: {
+      Authorization: token
+    }
+  });
+
+  const data = await response.json();
+
+  // Falls Fehler kommt, wird eine Meldung angezeigt
+  if (!response.ok) {
+    compareOutput.innerHTML = "Fehler beim Laden der Benutzer.";
+    return;
+  }
+
+  // Daten speichern, damit man später darauf zugreifen kann
+  allUsers = data;
+
+  // Dropdowns werden zuerst geleert, damit keine alten Daten bleiben
+  compareUser1.innerHTML = "";
+  compareUser2.innerHTML = "";
+
+  // Für jeden Benutzer wird eine Auswahlmöglichkeit erstellt
+  data.forEach(user => {
+
+    const option1 = document.createElement("option");
+    option1.value = user.id;
+    option1.textContent = user.username;
+
+    const option2 = document.createElement("option");
+    option2.value = user.id;
+    option2.textContent = user.username;
+
+    compareUser1.appendChild(option1);
+    compareUser2.appendChild(option2);
+  });
+}
+
 //Funktionen
 function speichereProfil() {
   if (
