@@ -37,10 +37,32 @@
         <hr />
 
         <div id="profile-output">
+
           <h2>Gespeicherte Werte</h2>
+
           <img id="profileImagePreview" width="120">
+
           <p id="outputText">Noch keine Daten gespeichert</p>
+
           <p id="overallText">Gesamtwert: -</p>
+          
+        </div>
+
+        <hr />
+
+        <!-- Bereich für Vergleich von zwei Benutzern -->
+        <div id="compare-section">
+          <h2>Vergleich</h2>
+
+          <!-- Auswahl von zwei Benutzern -->
+          <select id="compareUser1"></select>
+          <select id="compareUser2"></select>
+
+          <!-- Startet Vergleich -->
+          <button id="compareBtn" type="button">Vergleichen</button>
+
+          <!-- Ergebnis wird hier angezeigt -->
+          <div id="compareOutput"></div>
         </div>
       </div>
     </main>
