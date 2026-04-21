@@ -147,6 +147,39 @@ app.get('/api/users', authMiddleware, (req, res) => {
     res.json(users);
 });
 
+// Route berechnet Rangliste nach Gesamtwert
+app.get('/api/ranking', authMiddleware, (req, res) => {
+
+    // Rolle wird aus URL gelesen (Filter)
+    const role = req.query.role;
+
+    // Grundabfrage für alle Benutzer
+    let query = `
+        SELECT 
+            users.username,
+            users.role,
+            profiles.gesamtwert
+        FROM users
+        JOIN profiles ON users.id = profiles.user_id
+    `;
+
+    const params = [];
+
+    // Wenn Filter gesetzt ist, wird nur diese Rolle angezeigt
+    if (role && role !== 'Alle') {
+        query += ' WHERE users.role = ?';
+        params.push(role);
+    }
+
+    // Sortierung nach Gesamtwert, damit beste oben sind
+    query += ' ORDER BY profiles.gesamtwert DESC';
+
+    const ranking = database.prepare(query).all(...params);
+
+    // Ergebnis zurückgeben
+    res.json(ranking);
+});
+
 app.post('/api/sports', (req, res) => {
     const { name, ausdauer, kraft, schnelligkeit, koordination } = req.body;
 
@@ -190,19 +223,6 @@ app.post('/api/sports', (req, res) => {
         gesamtwert: gesamtwert
     });
 });
-
-app.get('/api/sports', (req, res) => {
-    
-    console.log('GET /api/sports aufgerufen');
-    const sportsData = database.prepare("SELECT * FROM sportsdata").all();
-    console.log('Daten aus der Datenbank:', sportsData);
-    
-    res.json({
-        message: 'Hallo Kai',
-        data: sportsData
-    });
-});
-
 
 app.listen(port, () => {
     console.log(`Server läuft auf http://localhost:${port}`);
