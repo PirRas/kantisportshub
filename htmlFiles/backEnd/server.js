@@ -123,6 +123,30 @@ app.post('/api/login', async (req, res) => {
     });
 });
 
+// Route gibt alle Benutzer mit ihren Werten zurück
+// Wird gebraucht, damit man später Benutzer vergleichen kann
+app.get('/api/users', authMiddleware, (req, res) => {
+
+    // Daten aus zwei Tabellen verbinden, weil Benutzer und Werte getrennt gespeichert sind
+    const users = database.prepare(`
+        SELECT 
+            users.id,
+            users.username,
+            users.role,
+            profiles.ausdauer,
+            profiles.kraft,
+            profiles.schnelligkeit,
+            profiles.koordination,
+            profiles.gesamtwert
+        FROM users
+        JOIN profiles ON users.id = profiles.user_id
+        ORDER BY users.username ASC
+    `).all();
+
+    // Daten werden als JSON an das Frontend geschickt
+    res.json(users);
+});
+
 app.post('/api/sports', (req, res) => {
     const { name, ausdauer, kraft, schnelligkeit, koordination } = req.body;
 
