@@ -8,7 +8,7 @@ const app = express();
 const port = 3000;
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 
 const database = new Database('database.db', { timeout: 5000 });
 // Tabelle für Benutzer (Login Daten)
@@ -33,6 +33,18 @@ database.prepare(`
         koordination INTEGER DEFAULT 0,
         gesamtwert REAL DEFAULT 0,
         FOREIGN KEY (user_id) REFERENCES users(id)
+    )
+`).run();
+// Tabelle für Sportdaten
+database.prepare(`
+    CREATE TABLE IF NOT EXISTS sportsdata (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        ausdauer INTEGER,
+        kraft INTEGER,
+        schnelligkeit INTEGER,
+        koordination INTEGER,
+        gesamtwert REAL
     )
 `).run();
 //Ist Benutzer eingeloggt?
@@ -134,39 +146,46 @@ app.get('/api/profile', authMiddleware, (req, res) => {
 
 // Profil speichern / Updaten
 app.put('/api/profile', authMiddleware, (req, res) => {
-    const { name, ausdauer, kraft, schnelligkeit, koordination, image } = req.body;
+    const { ausdauer, kraft, schnelligkeit, koordination, image } = req.body;
 
     const zahlen = [ausdauer, kraft, schnelligkeit, koordination].map(Number);
-
     if (zahlen.some(v => isNaN(v) || v < 0 || v > 100)) {
         return res.status(400).json({ message: 'Werte müssen 0–100 sein' });
     }
 
     const gesamtwert = zahlen.reduce((a, b) => a + b, 0) / 4;
 
-    const existing = database
-        .prepare('SELECT * FROM profiles WHERE user_id = ?')
-        .get(req.user.id);
+    // Wir nutzen UPDATE, da bei der Registrierung bereits ein Profil angelegt wurde
+    const stmt = database.prepare(`
+        UPDATE profiles 
+        SET image = ?, ausdauer = ?, kraft = ?, schnelligkeit = ?, koordination = ?, gesamtwert = ?
+        WHERE user_id = ?
+    `);
 
-    // Nur ein Name
-    const finalName = existing.name ? existing.name : name;
+    try {
+        stmt.run(image || '', zahlen[0], zahlen[1], zahlen[2], zahlen[3], gesamtwert, req.user.id);
+        res.json({ message: 'Profil erfolgreich aktualisiert', gesamtwert });
+    } catch (err) {
+        res.status(500).json({ message: 'Datenbankfehler', error: err.message });
+    }
+});
 
-    database.prepare(`
-        UPDATE profiles
-        SET name=?, image=?, ausdauer=?, kraft=?, schnelligkeit=?, koordination=?, gesamtwert=?
-        WHERE user_id=?
-    `).run(
-        finalName,
-        image || '',
-        zahlen[0],
-        zahlen[1],
-        zahlen[2],
-        zahlen[3],
-        gesamtwert,
-        req.user.id
-    );
+app.put('/api/username', authMiddleware, async (req, res) => {
+    const { username } = req.body;
 
-    res.json({ message: 'Profil gespeichert' });
+    if (!username || typeof username !== 'string' || username.trim() === '') {
+        return res.status(400).json({ message: 'Ungültiger Name' });
+    }
+
+    try {
+        database
+            .prepare('UPDATE users SET username = ? WHERE id = ?')
+            .run(username.trim(), req.user.id);
+
+        res.json({ message: 'Name erfolgreich aktualisiert' });
+    } catch (error) {
+        res.status(400).json({ message: 'Benutzername bereits vergeben' });
+    }
 });
 
 // Route gibt alle Benutzer mit ihren Werten zurück

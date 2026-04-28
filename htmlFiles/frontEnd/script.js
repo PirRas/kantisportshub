@@ -44,10 +44,10 @@ const rankingOutput = document.getElementById("rankingOutput");
 let allUsers = [];
 
 // Bild speichern
-imageInput.addEventListener("change", () => {
-    const file = imageInput.files[0];
+profileImageInput.addEventListener("change", () => {
+    const file = profileImageInput.files[0];
     const reader = new FileReader();
-    reader.onload = () => imageData = reader.result;
+    reader.onload = () => profileData.image = reader.result;
     reader.readAsDataURL(file);
 });
 
@@ -59,19 +59,37 @@ async function loadProfile() {
 
     const data = await res.json();
 
-    if (data.name) {
-        nameInput.value = data.name;
-        nameInput.disabled = true; 
-    }
+    const ausdauer = Number(data.ausdauer);
+    const kraft = Number(data.kraft);
+    const schnelligkeit = Number(data.schnelligkeit);
+    const koordination = Number(data.koordination);
 
-    endurance.value = data.ausdauer;
-    strength.value = data.kraft;
-    speed.value = data.schnelligkeit;
-    coordination.value = data.koordination;
+    enduranceInput.value = ausdauer;
+    strengthInput.value = kraft;
+    speedInput.value = schnelligkeit;
+    coordinationInput.value = koordination;
+
+    profileData.stats.ausdauer = ausdauer;
+    profileData.stats.kraft = kraft;
+    profileData.stats.schnelligkeit = schnelligkeit;
+    profileData.stats.koordination = koordination;
 
     if (data.image) {
-        document.getElementById("profileImagePreview").src = data.image;
+        profileImagePreview.src = data.image;
     }
+
+    const username = localStorage.getItem("username");
+    studentNameInput.value = username || "";
+    const gesamtwert = berechneGesamtwert();
+
+    outputText.innerHTML =
+        "Name: " + (username || "-") + "<br>" +
+        "Ausdauer: " + ausdauer + "<br>" +
+        "Kraft: " + kraft + "<br>" +
+        "Schnelligkeit: " + schnelligkeit + "<br>" +
+        "Koordination: " + koordination;
+
+    overallText.innerHTML = "Gesamtwert: " + gesamtwert.toFixed(1);
 }
 
 
@@ -202,29 +220,48 @@ async function ladeRangliste() {
 }
 
 // Button reagiert auf Klick
-saveProfileBtn.addEventListener("click", function () {
-  speichereProfil();
-  console.log("Aktuelles Profil:", profileData);
-  const name = studentNameInput.value;
-  const ausdauer = enduranceInput.value; 
-  const kraft = strengthInput.value;
-  const schnelligkeit = speedInput.value;
-  const koordination = coordinationInput.value;
+saveProfileBtn.addEventListener("click", async function () {
+  const payload = {
+    ausdauer: Number(enduranceInput.value),
+    kraft: Number(strengthInput.value),
+    schnelligkeit: Number(speedInput.value),
+    koordination: Number(coordinationInput.value),
+    image: profileData.image || profileImagePreview.src
+  };
 
-  fetch('http://localhost:3000/api/sports', {
-    method: 'POST',
+  const response = await fetch('http://localhost:3000/api/profile', {
+    method: 'PUT',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'Authorization': localStorage.getItem("token")
     },
-    body: JSON.stringify({ name, ausdauer, kraft, schnelligkeit, koordination })
-    })
-    .then(response => response.json())
-    .then(data => {
-      console.log('Erfolg:', data);
-    })
-    .catch((error) => {
-      console.error('Fehler:', error);
-    });
+    body: JSON.stringify(payload)
+  });
+
+  if (response.ok) {
+    if (studentNameInput.value) {
+      const nameResponse = await fetch('http://localhost:3000/api/username', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': localStorage.getItem("token")
+        },
+        body: JSON.stringify({ username: studentNameInput.value })
+      });
+
+      if (nameResponse.ok) {
+        localStorage.setItem("username", studentNameInput.value);
+      } else {
+        const nameData = await nameResponse.json();
+        alert("Fehler beim Speichern des Namens: " + nameData.message);
+        return;
+      }
+    }
+    alert("Profil erfolgreich aktualisiert!");
+    location.reload();
+  } else {
+    alert("Fehler beim Speichern!");
+  }
 });
 
 // Wird ausgeführt wenn der Button geklickt wird
@@ -269,5 +306,5 @@ loadRankingBtn.addEventListener("click", function () {
 // Testaufruf der Berechnungsfunktion (refs #11)
 console.log("Gesamtwert:", berechneGesamtwert());
 
-console.log(ladeAlleBenutzer());
-console.log(ladeRangliste());
+ladeAlleBenutzer();
+loadProfile();
