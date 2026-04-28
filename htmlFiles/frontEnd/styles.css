@@ -76,3 +76,47 @@ button {
 button:hover {
   background-color: #f39c12;
 }
+
+h1 {
+  font-size: 1.6em;
+  color: #2c3e50;
+  margin-bottom: 20px;
+}
+
+h2 {
+  font-size: 1.2em;
+  color: #2c3e50;
+  margin: 16px 0 12px 0;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid #eee;
+  margin: 24px 0;
+}
+
+#profileImagePreview {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+  margin-bottom: 12px;
+  border: 2px solid #ddd;
+}
+
+#outputText {
+  margin-bottom: 8px;
+  line-height: 1.8;
+}
+
+#overallText {
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+#compareOutput,
+#rankingOutput {
+  margin-top: 16px;
+  line-height: 1.8;
+}
