@@ -132,6 +132,23 @@ async function ladeAlleBenutzer() {
     compareUser1.appendChild(option1);
     compareUser2.appendChild(option2);
   });
+
+  const kartenContainer = document.getElementById("alle-karten");
+  kartenContainer.innerHTML = "";
+
+  data.forEach(function(user) {
+    kartenContainer.innerHTML +=
+      "<div class='spieler-karte'>" +
+        "<h3>" + user.username + "</h3>" +
+        "<p>" + user.role + "</p>" +
+        "<p>Ausdauer: " + user.ausdauer + "</p>" +
+        "<p>Kraft: " + user.kraft + "</p>" +
+        "<p>Schnelligkeit: " + user.schnelligkeit + "</p>" +
+        "<p>Koordination: " + user.koordination + "</p>" +
+        "<p>Gesamtwert: " + Number(user.gesamtwert).toFixed(1) + "</p>" +
+      "</div>";
+  });
+
 }
 
 //Funktionen

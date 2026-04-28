@@ -120,3 +120,28 @@ hr {
   margin-top: 16px;
   line-height: 1.8;
 }
+
+#alle-karten {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.spieler-karte {
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+  width: 180px;
+}
+
+.spieler-karte h3 {
+  color: #2c3e50;
+  margin-bottom: 8px;
+}
+
+.spieler-karte p {
+  font-size: 0.9em;
+  margin-bottom: 4px;
+}
